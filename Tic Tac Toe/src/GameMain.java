@@ -9,8 +9,8 @@ public class GameMain {
    private Board board;            // the game board
    private GameState currentState; // the current state of the game (of enum GameState)
    private Seed currentPlayer;     // the current player (of enum Seed)
-   private AIPlayerTableLookup AIplayer1;
-   
+   private AIPlayerMinimax AIplayer1;
+   private AIPlayerMinimax AIplayer2;
    
    
    
@@ -21,7 +21,10 @@ public class GameMain {
    /** Constructor to setup the game */
    public GameMain() {
       board = new Board();  // allocate game-board
-      
+      AIplayer1 = new AIPlayerMinimax(board);
+      AIplayer1.setSeed(Seed.CROSS);
+      AIplayer2 = new AIPlayerMinimax(board);
+      AIplayer2.setSeed(Seed.NOUGHT);
       
       // Initialize the game-board and current status
       initGame();
@@ -54,25 +57,30 @@ public class GameMain {
        Update Cell's content, Board's currentRow and currentCol. */
    public void playerMove(Seed theSeed) {
       boolean validInput = false;  // for validating input
-      AIplayer1 = new AIPlayerTableLookup(board);
+      
+      
       do {
     	  int row = 0;
     	  int col = 0;
          if (theSeed == Seed.CROSS) {
             System.out.println("Player 'X', enter your move (row[1-3] column[1-3]): ");
-            int[] test = AIplayer1.move();
+            //int[] test = AIplayer1.move();
             
-            row = test[0];
-            col = test[1];
-         } else {
-            System.out.print("Player 'O', enter your move (row[1-3] column[1-3]): ");
+            //row = test[0];
+            //col = test[1];
             
             row = in.nextInt() - 1;
             col = in.nextInt() - 1;
+         } else {
+            System.out.println("Player 'O', enter your move (row[1-3] column[1-3]): ");
+            
+            int[] test = AIplayer2.move();
+            
+            row = test[0];
+            col = test[1];
+            
          }
-         
-
-         
+                
          
          if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
                && board.cells[row][col].content == Seed.EMPTY) {
