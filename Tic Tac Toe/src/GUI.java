@@ -1,10 +1,10 @@
 package tictactoe;
 
 import lejos.hardware.BrickFinder;
+import lejos.hardware.Button;
 import lejos.hardware.lcd.*;
 import lejos.hardware.lcd.GraphicsLCD;
 import lejos.utility.Delay;
-import java.util.Scanner;
 
 
 public class GUI {
@@ -19,20 +19,18 @@ public class GUI {
 		int [][] board = {{0,0,0},{0,0,0},{0,0,0}};
 		int won = 0;
 		boolean full = false;
-		//drawBoard(board);
+		drawBoard(board);
 		do {
 			if (turn == 1) {
 				// Human's turn
 				// Wait for input human
-			    Scanner scan= new Scanner(System.in);
-			    System.out.println("Move human:");
-			    String text= scan.nextLine();
-			    move = new int[] {Integer.parseInt(text.substring(0, 1)),Integer.parseInt(text.substring(1, 2))};
+				move = humanMove(board);
 			} else {
+				// Computer's turn
 				move = AIMove(board);
 			}
 			board[move[0]][move[1]] = turn;
-			//drawBoard(board);
+			drawBoard(board);
 			won = someoneHasWon(board);
 			full = boardIsFull(board);
 			if (turn == 1) {
@@ -47,12 +45,16 @@ public class GUI {
 		//drawBoard(board);
 		Delay.msDelay(10000);
 	}
+	
+	
+
 	public static void drawBoard(int[][] board) {
 		GraphicsLCD g = BrickFinder.getDefault().getGraphicsLCD();
 		final int SW = g.getWidth();
 		final int SH = g.getHeight();
 		g.clear();
 		g.setFont(Font.getLargeFont());
+		g.setStrokeStyle(0);
 		g.drawLine(0, SH/3, SW, SH/3);
 		g.drawLine(0, 2*SH/3, SW, 2*SH/3);
 		g.drawLine(SW/3, 0, SW/3, SH);
@@ -71,6 +73,42 @@ public class GUI {
 			}
 		}
 	}
+	
+	public static int[] humanMove(int[][] board) {
+		int[] move_human = { 1 , 1 };
+		GraphicsLCD g = BrickFinder.getDefault().getGraphicsLCD();
+		final int SW = g.getWidth();
+		final int SH = g.getHeight();
+		int[][] pos_fields = { { SW/12, 5*SW / 12, 9 * SW / 12 }, { SH / 12, 5 * SH / 12, 9 * SH / 12 } };
+		while (true) {
+			drawBoard(board);
+			g.setStrokeStyle(1);
+			g.drawRect(pos_fields[0][move_human[1]], pos_fields[1][move_human[0]], 30, 30);
+			int but = Button.waitForAnyPress();
+            if ((but & Button.ID_ENTER) != 0) {
+            	break;
+            }
+            if ((but & Button.ID_LEFT) != 0) {
+            	move_human[1] = move_human[1]-1;
+            	if (move_human[1] < 0) move_human[1] = move_human[1]+3;
+            }
+            if ((but & Button.ID_RIGHT) != 0) {
+            	move_human[1] = move_human[1]+1;
+            	if (move_human[1] > 2) move_human[1] = move_human[1]-3;
+            }
+            if ((but & Button.ID_UP) != 0) {
+            	move_human[0] = move_human[0]-1;
+            	if (move_human[0] < 0) move_human[0] = move_human[0]+3;
+            }
+            if ((but & Button.ID_DOWN) != 0) {
+            	move_human[0] = move_human[0]+1;
+            	if (move_human[0] > 2) move_human[0] = move_human[0]-3;
+            }
+		}
+		return move_human;
+		
+	}
+
 	public static int[] AIMove(int[][] board) {
 		//What's the move of the computer?
 		int [] move = {1,1};
