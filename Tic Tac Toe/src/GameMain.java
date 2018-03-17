@@ -11,8 +11,16 @@ public class GameMain {
    private Seed currentPlayer;     // the current player (of enum Seed)
    private AIPlayerMinimax AIplayer1;
    private AIPlayerMinimax AIplayer2;
+   private GUI GUIlejos;
    
    
+   // Named-constants for the dimensions
+   public static final int ROWS = 3;
+   public static final int COLS = 3;
+   
+ 
+   
+   int currentRow, currentCol;  // the current seed's row and column
    
  
    private static Scanner in = new Scanner(System.in);  // input Scanner
@@ -20,18 +28,21 @@ public class GameMain {
  
    /** Constructor to setup the game */
    public GameMain() {
-      board = new Board();  // allocate game-board
+      board = new Board(3,3);  // allocate game-board
+      
       AIplayer1 = new AIPlayerMinimax(board);
       AIplayer1.setSeed(Seed.CROSS);
       AIplayer2 = new AIPlayerMinimax(board);
       AIplayer2.setSeed(Seed.NOUGHT);
+      GUIlejos = new GUI(board);
+            
       
       // Initialize the game-board and current status
       initGame();
       // Play the game once. Players CROSS and NOUGHT move alternately.
       do {
          playerMove(currentPlayer); // update the content, currentRow and currentCol
-         board.paint();             // ask the board to paint itself
+         GUIlejos.paint();             // ask the board to paint itself
          updateGame(currentPlayer); // update currentState
          // Print message if game-over
          if (currentState == GameState.CROSS_WON) {
@@ -51,6 +62,7 @@ public class GameMain {
       board.init();  // clear the board contents
       currentPlayer = Seed.CROSS;       // CROSS plays first
       currentState = GameState.PLAYING; // ready to play 
+       
    }
  
    /** The player with "theSeed" makes one move, with input validation.
@@ -97,9 +109,9 @@ public class GameMain {
  
    /** Update the currentState after the player with "theSeed" has moved */
    public void updateGame(Seed theSeed) {
-      if (board.hasWon(theSeed)) {  // check for win
+      if (hasWon(theSeed)) {  // check for win
          currentState = (theSeed == Seed.CROSS) ? GameState.CROSS_WON : GameState.NOUGHT_WON;
-      } else if (board.isDraw()) {  // check for draw
+      } else if (isDraw()) {  // check for draw
          currentState = GameState.DRAW;
       }
       // Otherwise, no change to current state (still GameState.PLAYING).
@@ -117,4 +129,37 @@ public class GameMain {
    public static int COLS() {
 	   return Board.COLS;	   
    }
+   
+   /** Return true if it is a draw (i.e., no more EMPTY cell) */
+   public boolean isDraw() {
+      for (int row = 0; row < ROWS; ++row) {
+         for (int col = 0; col < COLS; ++col) {
+            if (board.cells[row][col].content == Seed.EMPTY) {
+               return false; // an empty seed found, not a draw, exit
+            }
+         }
+      }
+      return true; // no empty cell, it's a draw
+   }
+   
+   
+   /** Return true if the player with "theSeed" has won after placing at
+   (currentRow, currentCol) */
+   public boolean hasWon(Seed theSeed) {
+	   	  
+	      return (board.cells[currentRow][0].content == theSeed         // 3-in-the-row
+	                   && board.cells[currentRow][1].content == theSeed
+	                   && board.cells[currentRow][2].content == theSeed
+	              || board.cells[0][currentCol].content == theSeed      // 3-in-the-column
+	                   && board.cells[1][currentCol].content == theSeed
+	                   && board.cells[2][currentCol].content == theSeed
+	              || currentRow == currentCol            // 3-in-the-diagonal
+	                   && board.cells[0][0].content == theSeed
+	                   && board.cells[1][1].content == theSeed
+	                   && board.cells[2][2].content == theSeed
+	              || currentRow + currentCol == 2    // 3-in-the-opposite-diagonal
+	                   && board.cells[0][2].content == theSeed
+	                   && board.cells[1][1].content == theSeed
+	                   && board.cells[2][0].content == theSeed);
+	}
 }
