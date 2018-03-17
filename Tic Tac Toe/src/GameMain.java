@@ -10,7 +10,7 @@ public class GameMain {
    private GameState currentState; // the current state of the game (of enum GameState)
    private Seed currentPlayer;     // the current player (of enum Seed)
    private AIPlayerMinimax AIplayer1;
-   private AIPlayerMinimax AIplayer2;
+   private AIPlayerTableLookup AIplayer2;
    private GUI GUIlejos;
    
    
@@ -32,7 +32,7 @@ public class GameMain {
       
       AIplayer1 = new AIPlayerMinimax(board);
       AIplayer1.setSeed(Seed.CROSS);
-      AIplayer2 = new AIPlayerMinimax(board);
+      AIplayer2 = new AIPlayerTableLookup(board);
       AIplayer2.setSeed(Seed.NOUGHT);
       GUIlejos = new GUI(board);
             
@@ -69,8 +69,7 @@ public class GameMain {
        Update Cell's content, Board's currentRow and currentCol. */
    public void playerMove(Seed theSeed) {
       boolean validInput = false;  // for validating input
-      
-      
+            
       do {
     	  int row = 0;
     	  int col = 0;
@@ -97,8 +96,8 @@ public class GameMain {
          if (row >= 0 && row < Board.ROWS && col >= 0 && col < Board.COLS
                && board.cells[row][col].content == Seed.EMPTY) {
             board.cells[row][col].content = theSeed;
-            board.currentRow = row;
-            board.currentCol = col;
+            currentRow = row;
+            currentCol = col;
             validInput = true; // input okay, exit loop
          } else {
             System.out.println("This move at (" + (row + 1) + "," + (col + 1)
@@ -146,8 +145,7 @@ public class GameMain {
    /** Return true if the player with "theSeed" has won after placing at
    (currentRow, currentCol) */
    public boolean hasWon(Seed theSeed) {
-	   	  
-	      return (board.cells[currentRow][0].content == theSeed         // 3-in-the-row
+	   	  return (board.cells[currentRow][0].content == theSeed         // 3-in-the-row
 	                   && board.cells[currentRow][1].content == theSeed
 	                   && board.cells[currentRow][2].content == theSeed
 	              || board.cells[0][currentCol].content == theSeed      // 3-in-the-column

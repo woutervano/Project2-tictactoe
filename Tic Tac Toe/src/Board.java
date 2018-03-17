@@ -3,12 +3,11 @@
  */
 public class Board {  // save as Board.java
    // Named-constants for the dimensions
-   int ROWS;
-   int COLS;
+   public static int ROWS;
+   public static int COLS;
  
    // package access
    Cell[][] cells;  // a board composes of ROWS-by-COLS Cell instances
-   int currentRow, currentCol;  // the current seed's row and column
  
    /** Constructor to initialize the game board */
    public Board(int rows, int cols) {

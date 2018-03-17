@@ -100,15 +100,5 @@ public class GUI {
    }
 
 
-	public static boolean boardIsFull(int [][] board) {
-		int count = 0;
-		for (int ix = 0; ix < 3; ix++) {
-			for (int iy = 0; iy < 3; iy++) {
-				if (board[iy][ix] == 0) count++;
-			}
-		}
-		if (count == 0) return true;
-		return false;
 
-	}
 }
