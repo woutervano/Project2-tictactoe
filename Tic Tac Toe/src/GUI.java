@@ -1,4 +1,4 @@
-package tictactoe;
+
 
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
@@ -8,47 +8,23 @@ import lejos.utility.Delay;
 
 
 public class GUI {
-
-	public static void main(String[] args) {
-		//Player 1 = Human (X)
-		//Player 2 = Computer (O)
-
-		//BEGIN GAME
-		int turn = 1;
-		int [] move;
-		int [][] board = {{0,0,0},{0,0,0},{0,0,0}};
-		int won = 0;
-		boolean full = false;
-		drawBoard(board);
-		do {
-			if (turn == 1) {
-				// Human's turn
-				// Wait for input human
-				move = humanMove(board);
-			} else {
-				// Computer's turn
-				move = AIMove(board);
-			}
-			board[move[0]][move[1]] = turn;
-			drawBoard(board);
-			won = someoneHasWon(board);
-			full = boardIsFull(board);
-			if (turn == 1) {
-				turn = 2;
-			} else {
-				turn = 1;
-			}
-		} while (won == 0&&!full);
-		if (won != 0) {
-			System.out.println("Player " + Integer.toString(won)+" has won!");
-		}
-		//drawBoard(board);
-		Delay.msDelay(10000);
+	
+   protected Cell[][] cells; // the board's ROWS-by-COLS array of Cells
+   protected Seed mySeed;    // computer's seed
+   protected Seed oppSeed;   // opponent's seed	
+   
+   public int ROWS;
+   public int COLS;
+	
+	public GUI(Board board) {
+		cells = board.cells;
+		ROWS = board.ROWS;
+		COLS = board.COLS;
+		
+		//drawBoard();
 	}
-	
-	
 
-	public static void drawBoard(int[][] board) {
+	public void drawBoard() {
 		GraphicsLCD g = BrickFinder.getDefault().getGraphicsLCD();
 		final int SW = g.getWidth();
 		final int SH = g.getHeight();
@@ -63,10 +39,10 @@ public class GUI {
 		int [][] pos_fields = {{SW/6,SW/2,5*SW/6},{7*SH/24,15*SH/24,23*SH/24}};
 		for (int ix=0;ix<3;ix++) {
 			for (int iy=0;iy<3;iy++) {
-				if (board[iy][ix] != 0) {
-					if (board[iy][ix] == 1) {
+				if (cells[iy][ix].content != Seed.EMPTY) {
+					if (cells[iy][ix].content == Seed.CROSS) {
 						g.drawChar('X',pos_fields[0][ix],pos_fields[1][iy],GraphicsLCD.HCENTER|GraphicsLCD.BASELINE);
-					} else if (board[iy][ix] == 2) {
+					} else if (cells[iy][ix].content == Seed.CROSS) {
 						g.drawChar('O',pos_fields[0][ix],pos_fields[1][iy],GraphicsLCD.HCENTER|GraphicsLCD.BASELINE);
 					}
 				}
@@ -74,14 +50,14 @@ public class GUI {
 		}
 	}
 	
-	public static int[] humanMove(int[][] board) {
+	int[] humanMove() {
 		int[] move_human = { 1 , 1 };
 		GraphicsLCD g = BrickFinder.getDefault().getGraphicsLCD();
 		final int SW = g.getWidth();
 		final int SH = g.getHeight();
 		int[][] pos_fields = { { SW/12, 5*SW / 12, 9 * SW / 12 }, { SH / 12, 5 * SH / 12, 9 * SH / 12 } };
 		while (true) {
-			drawBoard(board);
+			drawBoard();
 			g.setStrokeStyle(1);
 			g.drawRect(pos_fields[0][move_human[1]], pos_fields[1][move_human[0]], 30, 30);
 			int but = Button.waitForAnyPress();
@@ -108,50 +84,22 @@ public class GUI {
 		return move_human;
 		
 	}
+	
+	/** Paint itself */
+	public void paint() {
+      for (int row = 0; row < ROWS; ++row) {
+         for (int col = 0; col < COLS; ++col) {
+            cells[row][col].paint();   // each cell paints itself
+            if (col < COLS - 1) System.out.print("|");
+         }
+         System.out.println();
+         if (row < ROWS - 1) {
+            System.out.println("-----------");
+         }
+      }
+   }
 
-	public static int[] AIMove(int[][] board) {
-		//What's the move of the computer?
-		int [] move = {1,1};
-		return move;
-	}
-	public static int someoneHasWon(int[][] board) {
-		int count1 = 0, count2 = 0;
-		for (int ix = 0; ix < 3; ix++) {
-			for (int iy = 0; iy < 3; iy++) {
-				if (board[iy][ix] == 1) count1++;
-				if (board[iy][ix] == 2) count2++;
-			}
-			if (count1 == 3) return 1;
-			if (count2 == 3) return 2;
-			count1 = 0;
-			count2 = 0;
-		}
-		for (int iy = 0; iy < 3; iy++) {
-			for (int ix = 0; ix < 3; ix++) {
-				if (board[iy][ix] == 1) count1++;
-				if (board[iy][ix] == 2) count2++;
-			}
-			if (count1 == 3) return 1;
-			if (count2 == 3) return 2;
-			count1 = 0;
-			count2 = 0;
-		}
-		for (int i = 0; i < 3; i++) {
-			if (board[i][i] == 1) count1++;
-			if (board[i][i] == 2) count2++;
-		}
-		if (count1 == 3) return 1;
-		if (count2 == 3) return 2;
-		count1 = 0;
-		count2 = 0;
-		for (int i = 0; i < 3; i++) {
-			if (board[i][2-i] == 1) count1++;
-			if (board[i][2-i] == 2) count2++;
-		}
-		if (count1 == 3) return 1;
-		if (count2 == 3) return 2;
-		return 0;
-	}
+
 	public static boolean boardIsFull(int [][] board) {
 		int count = 0;
 		for (int ix = 0; ix < 3; ix++) {
