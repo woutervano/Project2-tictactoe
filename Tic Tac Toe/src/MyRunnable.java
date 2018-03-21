@@ -11,7 +11,7 @@ public class MyRunnable implements Runnable {
     	
         while(!Thread.interrupted()) {
     		try {
-    			Thread.sleep(5000);
+    			Thread.sleep(1000);
     			System.out.println("thread 1" +  Thread.currentThread().getName());
     			
     			
@@ -22,6 +22,10 @@ public class MyRunnable implements Runnable {
     		   
          }
         // code in the other thread, can reference "var" variable
+    }
+    
+    public void writesomething() {
+    	System.out.println("thread 12222");
     }
 
 }
