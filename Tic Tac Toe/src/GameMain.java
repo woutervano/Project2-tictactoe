@@ -12,7 +12,7 @@ public class GameMain {
    private AIPlayerMinimax AIplayer1;
    private AIPlayerTableLookup AIplayer2;
    private GUI GUIlejos;
-   
+   private MyRunnable myRunnable;
    
    // Named-constants for the dimensions
    public static final int ROWS = 3;
@@ -26,8 +26,15 @@ public class GameMain {
    private static Scanner in = new Scanner(System.in);  // input Scanner
 
  
-   /** Constructor to setup the game */
+   /** Constructor to setup the game 
+ * @throws InterruptedException */
    public GameMain() {
+   
+	  
+      myRunnable = new MyRunnable();
+      Thread t = new Thread(myRunnable);
+      t.start();
+      
       board = new Board(3,3);  // allocate game-board
       
       AIplayer1 = new AIPlayerMinimax(board);
@@ -41,6 +48,7 @@ public class GameMain {
       initGame();
       // Play the game once. Players CROSS and NOUGHT move alternately.
       do {
+    	 // coint();
          playerMove(currentPlayer); // update the content, currentRow and currentCol
          GUIlejos.paint();             // ask the board to paint itself
          updateGame(currentPlayer); // update currentState
@@ -55,6 +63,7 @@ public class GameMain {
          // Switch player
          currentPlayer = (currentPlayer == Seed.CROSS) ? Seed.NOUGHT : Seed.CROSS;
       } while (currentState == GameState.PLAYING);  // repeat until game-over
+      
    }
  
    /** Initialize the game-board contents and the current states */
@@ -160,4 +169,7 @@ public class GameMain {
 	                   && board.cells[1][1].content == theSeed
 	                   && board.cells[2][0].content == theSeed);
 	}
+   
+
+
 }
