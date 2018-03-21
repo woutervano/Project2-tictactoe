@@ -1,0 +1,19 @@
+import lejos.hardware.motor.Motor;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.robotics.SampleProvider;
+
+public class program {
+	
+ public static EV3ColorSensor colorsensor = new EV3ColorSensor(SensorPort.S1);
+ public static SampleProvider color = colorsensor.getColorIDMode();
+ //color ID. 0 = red; 1 = green; 2 = blue; 3 = yellow; 4 = magenta; 5 = orange; 6 = white; 7 = black; 8 = pink; 9 = gray; 10 = light gray
+ public static void main(String[]args){
+ public static float[] sample = new float[color.sampleSize()];	 
+ //public static final float limitColor=2;
+ color.fetchSample(sample, 0);
+ int colorId=(int)sample[0];
+ //https://www.programcreek.com/java-api-examples/?api=lejos.hardware.sensor.EV3ColorSensor
+ lcd.drawString(colorId,0,0);
+ 
+ }
+ 
